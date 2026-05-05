@@ -2,12 +2,12 @@ import sqlite3
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
-# 1.Flask e Socket.io
+# Flask e Socket.io
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pinbas'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# 2. Rota para a página do Aluno (a principal)
+# Página inicial
 @app.route('/')
 def index():
     return render_template('index.html')
