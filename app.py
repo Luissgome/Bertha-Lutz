@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
@@ -11,11 +12,11 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 def index():
     return render_template('index.html')
 
-# 3. Rota para a página da Professora
-@app.route('/professor')
+# Página da Admin
+@app.route('/admin')
 def admin():
     return render_template('admin.html')
 
-# 4. Iniciar o servidor
+# Servidor
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5500)
