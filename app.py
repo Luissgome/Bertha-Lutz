@@ -11,12 +11,9 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 @app.route('/')
 def index():
     return render_template('index.html')
-
-# Página da Admin
 @app.route('/admin')
 def admin():
     return render_template('admin.html')
 
-# Servidor
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5500)
