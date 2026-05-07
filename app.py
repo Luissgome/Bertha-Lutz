@@ -14,6 +14,9 @@ def index():
 @app.route('/admin')
 def admin():
     return render_template('admin.html')
+@app.route('/iniciar')
+def iniciar():
+    return render_template('iniciar.html')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5500)
