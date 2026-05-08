@@ -18,7 +18,6 @@ function acessar() {
 }
 
 function criarSala() {
-    
     gerarCodigo();
 }
 
@@ -27,13 +26,15 @@ function gerarCodigo() {
     let senha = '';
     let divCodigo = document.getElementById('divCodigo');
     let codigoGerado = document.createElement('p');
-    
+    divCodigo.appendChild(codigoGerado);
     
     for (let i = 0; i < 4; i++) {
         const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
         senha += caracteres[indiceAleatorio];
     }
-    document.divCodigo.appendChild(codigoGerado);
+    
     codigoGerado.innerText = `${senha}`;
   return senha;
 }
+
+const codigoDaSala = gerarCodigo();
