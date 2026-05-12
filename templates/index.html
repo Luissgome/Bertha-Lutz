@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
-    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <h1>Bertha Lutz</h1>
+    
     <div class="styles" id="divDeSalas">
-        <a href="iniciar"><button style="height: 100px; width: 200px;" id="Sala" onclick="criarSala()">Criar Sala</button></a> <br>
-        <a><button onclick="entrarSala()">Entrar</button></a> <br>
+        <button style="height: 100px; width: 200px;" id="Sala" onclick="criarSala()">Criar Sala</button> 
+        <br>
+        <button onclick="entrarSala()">Entrar</button>
+        <br>
     </div>
-    <script src="static/js/index.js"></script>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>

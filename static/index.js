@@ -1,4 +1,13 @@
 let verificacao = false;
+const socket = io();
+
+
+function criarSala() {
+    const senhaGerada = gerarCodigo();
+
+    socket.emit('registrar_rota', { codigo: senhaGerada});
+}
+
 function entrarSala() {
     if (verificacao == false) {
         let inputAcessar = document.createElement('input');
@@ -17,10 +26,6 @@ function acessar() {
     codigo.value = '';
 }
 
-function criarSala() {
-    gerarCodigo();
-}
-
 function gerarCodigo() {
     const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; 
     let senha = '';
@@ -33,8 +38,7 @@ function gerarCodigo() {
         senha += caracteres[indiceAleatorio];
     }
     
-    codigoGerado.innerText = `${senha}`;
+    codigoGerado.innerText = senha;
   return senha;
 }
 
-const codigoDaSala = gerarCodigo();

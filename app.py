@@ -46,6 +46,16 @@ def admin():
 def iniciar():
     return render_template('iniciar.html')
 
+@socketio.on('registrar_rota')
+def registrar_rota(dados):
+    codigo = dados.get('codigo')
+    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js) VALUES (%s, %s, %s)"
+    executar_query(sql, (codigo, "SALA_CRIADA", "AGUARDANDO_ALUNO"))
+
+@app.route('/quiz/<codigo_da_sala>')
+def acessar_quiz_dinamico(codigo_da_sala):
+    
+
 @socketio.on('enviar_progresso')
 def salvar_progresso(dados):
     id_sessao = dados.get('id')
@@ -59,8 +69,7 @@ def salvar_progresso(dados):
 @socketio.on('buscar_ranking')
 def enviar_ranking():
     conexao = mysql.connector.connect(**banco)
-    cursor = conexao.cursor(dictionary=True) # Retorna como dicionário para facilitar o JS
-    
+    cursor = conexao.cursor(dictionary=True)
     sql = "SELECT nome_aluno, acertos FROM codigos_temporarios ORDER BY acertos DESC LIMIT 5"
     cursor.execute(sql)
     ranking = cursor.fetchall()
@@ -78,4 +87,3 @@ def deletar_dados():
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5500)
-    
