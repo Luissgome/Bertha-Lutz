@@ -54,7 +54,17 @@ def registrar_rota(dados):
 
 @app.route('/quiz/<codigo_da_sala>')
 def acessar_quiz_dinamico(codigo_da_sala):
-    
+    conexao = mysql.connector.connect(**banco)
+    cursor = conexao.cursor(dictionary=True)
+    cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo_da_sala,))
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexao.close()
+
+    if resultado:
+        return render_template('iniciar.html', sala=codigo_da_sala)
+    else:
+        return "<h1>Sala não encontrada!</h1>", 404
 
 @socketio.on('enviar_progresso')
 def salvar_progresso(dados):
