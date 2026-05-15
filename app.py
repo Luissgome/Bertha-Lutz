@@ -19,12 +19,11 @@ def executar_query(sql, valores=None):
             cursor.execute(sql, valores)
         else:
             cursor.execute(sql)
-        
         conexao.commit()
-        print("SQL executado!")
-        
+        return True
     except Error as e:
         print(f"Erro no MySQL: {e}")
+        return False
     finally:
         if conexao and conexao.is_connected():
             cursor.close()
@@ -42,18 +41,24 @@ def index():
 @app.route('/admin')
 def admin():
     return render_template('admin.html')
-@app.route('/iniciar')
+@app.route('/quiz')
 def iniciar():
-    return render_template('iniciar.html')
+    return render_template('quiz.html')
 
 @socketio.on('registrar_rota')
 def registrar_rota(dados):
     codigo = dados.get('codigo')
+    if not codigo:
+        return {'status': 'erro', 'mensagem': 'Código não enviado'}
+
     sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js) VALUES (%s, %s, %s)"
-    executar_query(sql, (codigo, "SALA_CRIADA", "AGUARDANDO_ALUNO"))
+    sucesso = executar_query(sql, (codigo, "SALA_CRIADA", "AGUARDANDO_ALUNO"))
+    if sucesso:
+        return {'status': 'ok'}
+    return {'status': 'erro', 'mensagem': 'Erro ao gravar no banco'}
 
 @app.route('/quiz/<codigo_da_sala>')
-def acessar_quiz_dinamico(codigo_da_sala):
+def acessar_quiz(codigo_da_sala):
     conexao = mysql.connector.connect(**banco)
     cursor = conexao.cursor(dictionary=True)
     cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo_da_sala,))
@@ -62,7 +67,7 @@ def acessar_quiz_dinamico(codigo_da_sala):
     conexao.close()
 
     if resultado:
-        return render_template('iniciar.html', sala=codigo_da_sala)
+        return render_template('quiz.html', sala=codigo_da_sala)
     else:
         return "<h1>Sala não encontrada!</h1>", 404
 

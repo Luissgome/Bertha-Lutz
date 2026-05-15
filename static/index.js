@@ -1,44 +1,82 @@
 let verificacao = false;
 const socket = io();
 
-
 function criarSala() {
     const senhaGerada = gerarCodigo();
-
-    socket.emit('registrar_rota', { codigo: senhaGerada});
+    socket.emit('registrar_rota', { codigo: senhaGerada }, (res) => {
+        if (res && res.status === 'ok') {
+            window.location.href = `/quiz/${senhaGerada}`;
+            return;
+        }
+        alert('Erro ao criar a sala. Tente novamente.');
+    });
 }
 
 function entrarSala() {
-    if (verificacao == false) {
-        let inputAcessar = document.createElement('input');
-        let botaoAcessar = document.createElement('button');
-        botaoAcessar.innerHTML = '<button onclick="acessar()" id="acessarId">Acessar</button>';
-        inputAcessar.innerHTML = '<input type="text" name="nome" placeholder="Seu nome">';
-        document.body.appendChild(inputAcessar);
-        document.body.appendChild(botaoAcessar);
-        verificacao = true;
+    if (verificacao) {
+        return;
     }
+
+    const container = document.getElementById('divDeSalas') || document.body;
+    const wrapper = document.createElement('div');
+    wrapper.id = 'acessoSalaWrapper';
+
+    const inputAcessar = document.createElement('input');
+    inputAcessar.type = 'text';
+    inputAcessar.name = 'senha';
+    inputAcessar.placeholder = 'Código da sala';
+    inputAcessar.id = 'codigoSalaInput';
+
+    const botaoAcessar = document.createElement('button');
+    botaoAcessar.type = 'button';
+    botaoAcessar.textContent = 'Acessar';
+    botaoAcessar.addEventListener('click', acessar);
+
+    wrapper.appendChild(inputAcessar);
+    wrapper.appendChild(botaoAcessar);
+    container.appendChild(wrapper);
+    verificacao = true;
 }
 
 function acessar() {
-    let botaoAcessar = document.getElementById('acessarId');
-    let codigo = document.querySelector('input');
-    codigo.value = '';
+    const input = document.getElementById('codigoSalaInput');
+    const codigo = input ? input.value.trim() : '';
+
+    if (!codigo) {
+        alert('Digite o código da sala para acessar.');
+        return;
+    }
+
+    window.location.href = `/quiz/${codigo}`;
 }
 
 function gerarCodigo() {
-    const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; 
+    const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let senha = '';
-    let divCodigo = document.getElementById('divCodigo');
-    let codigoGerado = document.createElement('p');
-    divCodigo.appendChild(codigoGerado);
-    
+
     for (let i = 0; i < 4; i++) {
         const indiceAleatorio = Math.floor(Math.random() * caracteres.length);
         senha += caracteres[indiceAleatorio];
     }
-    
-    codigoGerado.innerText = senha;
-  return senha;
+
+    return senha;
 }
+
+function mostrarCodigoSalaAtual() {
+    const path = window.location.pathname;
+    const partes = path.split('/').filter(Boolean);
+
+    if (partes.length === 2 && partes[0] === 'quiz') {
+        const codigoDaSala = partes[1];
+        const div = document.getElementById('divCodigo');
+        if (div) {
+            const textoCodigo = document.createElement('h2');
+            div.insertBefore(textoCodigo, div.firstChild);
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', mostrarCodigoSalaAtual);
+
+
 
