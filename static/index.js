@@ -3,13 +3,25 @@ const socket = io();
 
 function criarSala() {
     const senhaGerada = gerarCodigo();
-    socket.emit('registrar_rota', { codigo: senhaGerada }, (res) => {
+    const nome_aluno = document.getElementById('inputNome').value.trim();
+    
+
+    
+    if (!nome_aluno) {
+        alert('Digite seu nome antes de criar a sala.');
+        return;
+    }
+
+    socket.emit('registrar_rota', { codigo: senhaGerada, nome: nome_aluno }, (res) => {
         if (res && res.status === 'ok') {
             window.location.href = `/quiz/${senhaGerada}`;
+            
             return;
         }
         alert('Erro ao criar a sala. Tente novamente.');
     });
+    const nomeDoAluno = document.getElementById('nomeDoAluno');
+    nomeDoAluno.innerText = `Nome: ${nome_aluno}`;
 }
 
 function entrarSala() {
@@ -41,9 +53,14 @@ function entrarSala() {
 function acessar() {
     const input = document.getElementById('codigoSalaInput');
     const codigo = input ? input.value.trim() : '';
+    const nome_aluno = document.getElementById('inputNome').value.trim();
 
     if (!codigo) {
         alert('Digite o código da sala para acessar.');
+        return;
+    }
+    if (!nome_aluno) {
+        alert('Digite seu nome antes de acessar a sala.');
         return;
     }
 

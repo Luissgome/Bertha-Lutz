@@ -3,6 +3,10 @@ from mysql.connector import Error
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'pinbas'
+socketio = SocketIO(app, cors_allowed_origins="*")
+
 banco = {
     'host': 'localhost',
     'user': 'root',
@@ -30,11 +34,6 @@ def executar_query(sql, valores=None):
             conexao.close()
 
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'pinbas'
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -45,17 +44,37 @@ def admin():
 def iniciar():
     return render_template('quiz.html')
 
-@socketio.on('registrar_rota')
+@socketio.on('registrar_rota')                                                  # ROTA
 def registrar_rota(dados):
     codigo = dados.get('codigo')
-    if not codigo:
-        return {'status': 'erro', 'mensagem': 'Código não enviado'}
+    nome = dados.get('nome')
+    if not codigo or not nome:
+        return {'status': 'erro', 'mensagem': 'Código e nome são obrigatórios'}
 
     sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js) VALUES (%s, %s, %s)"
-    sucesso = executar_query(sql, (codigo, "AGUARDANDO_ALUNO", "SALA_CRIADA"))
+    sucesso = executar_query(sql, (codigo, nome, "SALA_CRIADA"))
     if sucesso:
         return {'status': 'ok'}
     return {'status': 'erro', 'mensagem': 'Erro ao gravar no banco'}
+
+@socketio.on('registrar_sessao')                                                  # ROTA
+def registrar_sessao(dados):
+    codigo = dados.get('codigo')
+    nome = dados.get('nome')
+    if not codigo or not nome:
+        return {'status': 'erro', 'mensagem': 'Código e nome são obrigatórios'}
+
+    conexao = mysql.connector.connect(**banco)
+    cursor = conexao.cursor(dictionary=True)
+    cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo,))
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexao.close()
+
+    if not resultado:
+        return {'status': 'erro', 'mensagem': 'Sala não encontrada'}
+
+    return {'status': 'ok'}
 
 @app.route('/quiz/<codigo_da_sala>')
 def acessar_quiz(codigo_da_sala):
@@ -94,7 +113,7 @@ def enviar_ranking():
     
     emit('atualizar_ranking', ranking, broadcast=True)
 
-# Função para limpar o banco (ao terminar o evento)
+
 @socketio.on('limpar_banco')
 def deletar_dados():
     sql = "DELETE FROM codigos_temporarios"
