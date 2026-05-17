@@ -52,7 +52,7 @@ def registrar_rota(dados):
         return {'status': 'erro', 'mensagem': 'Código não enviado'}
 
     sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js) VALUES (%s, %s, %s)"
-    sucesso = executar_query(sql, (codigo, "SALA_CRIADA", "AGUARDANDO_ALUNO"))
+    sucesso = executar_query(sql, (codigo, "AGUARDANDO_ALUNO", "SALA_CRIADA"))
     if sucesso:
         return {'status': 'ok'}
     return {'status': 'erro', 'mensagem': 'Erro ao gravar no banco'}
