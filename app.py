@@ -57,24 +57,19 @@ def registrar_rota(dados):
         return {'status': 'ok'}
     return {'status': 'erro', 'mensagem': 'Erro ao gravar no banco'}
 
-@socketio.on('registrar_sessao')                                                  # ROTA
-def registrar_sessao(dados):
-    codigo = dados.get('codigo')
-    nome = dados.get('nome')
-    if not codigo or not nome:
-        return {'status': 'erro', 'mensagem': 'Código e nome são obrigatórios'}
-
+@app.route('/quiz/<codigo_da_sala>/questoes')
+def acessar_questoes(codigo_da_sala):
     conexao = mysql.connector.connect(**banco)
     cursor = conexao.cursor(dictionary=True)
-    cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo,))
+    cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo_da_sala,))
     resultado = cursor.fetchone()
     cursor.close()
     conexao.close()
 
-    if not resultado:
-        return {'status': 'erro', 'mensagem': 'Sala não encontrada'}
-
-    return {'status': 'ok'}
+    if resultado:
+        return render_template('perguntas.html', sala=codigo_da_sala)
+    else:
+        return "<h1>Sala não encontrada!</h1>", 404
 
 @app.route('/quiz/<codigo_da_sala>')
 def acessar_quiz(codigo_da_sala):
@@ -100,6 +95,15 @@ def salvar_progresso(dados):
     sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js, acertos) VALUES (%s, %s, %s, %s)"
     executar_query(sql, (id_sessao, nome, codigo, acertos))
 
+
+@socketio.on('começar_quiz_sala')
+def comecar_quiz_sala(dados):
+    """Recebe do criador para iniciar o quiz e notifica os membros."""
+    sala = dados.get('sala')
+    nome = dados.get('nome')
+
+    emit('quiz_iniciar', {'sala': sala, 'nome': nome}, broadcast=True)
+
 @socketio.on('buscar_ranking')
 def enviar_ranking():
     conexao = mysql.connector.connect(**banco)
@@ -116,7 +120,7 @@ def enviar_ranking():
 
 @socketio.on('limpar_banco')
 def deletar_dados():
-    sql = "DELETE FROM codigos_temporarios"
+    sql = "DELETE FROM codigos_temporarios WHERE id"
     executar_query(sql)
 
 if __name__ == '__main__':

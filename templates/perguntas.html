@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Iniciar Sessão</h1>
-    <button id="btnIniciarQuiz" style="display: none;" onclick="iniciarJogo()">Começar</button>
+    <h1>perguntas</h1>
 
-    <div id="divCodigo">
-        <a href="/"><button>Voltar</button></a>
-        {% if sala %}
-            <h2>Código da Sala: {{ sala }}</h2>
-        {% endif %}
-        <div id="infoSessao"></div>
-    </div>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
