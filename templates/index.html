@@ -7,17 +7,49 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Bertha Lutz</h1>
-    <input type="text" id="inputNome" placeholder="Seu nome">
-    
-    <div class="styles" id="divDeSalas">
-        <button style="height: 100px; width: 200px;" id="Sala" onclick="criarSala()">Criar Sala</button> 
-        <br>
-        <button onclick="entrarSala()">Entrar</button>
-        <br>
+    <div class="page-shell">
+        <header class="header-bar">
+            <div>
+                <h1>Quiz</h1>
+            </div>
+            <div class="input-top-right">
+                <input type="text" id="inputNome" placeholder="Seu nome">
+            </div>
+        </header>
+
+        <main class="content-card">
+            <div class="card-inner centered">
+                <div class="button-group">
+                    <button id="Sala" onclick="criarSala()">Criar Sala</button>
+                    <button class="secondary" onclick="entrarSala()">Entrar</button>
+                </div>
+            </div>
+        </main>
+
+        <button class="help-button" onclick="mostrarConteudo()"><strong>?</strong></button>
+
+        <div id="conteudo" class="info-panel" style="display: none;">
+            <h2>Leis importantes no Brasil</h2>
+            <p>
+                O Brasil possui várias leis para proteger as mulheres:
+            </p>
+            <p>
+                Lei Maria da Penha: protege mulheres contra violência doméstica e familiar.
+            </p>
+            <p>
+                Lei do Minuto Seguinte: garante atendimento imediato e gratuito às vítimas de violência sexual.
+            </p>
+            <p>
+                Lei Carolina Dieckmann: combate crimes virtuais como invasão de dispositivos.
+            </p>
+            <p>
+                Lei Rose Leonel: pune quem divulga conteúdo íntimo sem autorização.
+            </p>
+        </div>
     </div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="static/quiz.js"></script>
 </body>
 </html>

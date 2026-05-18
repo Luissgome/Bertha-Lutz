@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perguntas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="header-bar">
+            <h1>Perguntas</h1>
+        </header>
+
+        <main class="content-card grid-two">
+            <section class="quiz-card">
+                <h2 id="textoPergunta">Carregando pergunta...</h2>
+                <div id="alternativas" class="alternativas">
+                    <button id="btn0" class="alternativa"></button>
+                    <button id="btn1" class="alternativa"></button>
+                    <button id="btn2" class="alternativa"></button>
+                    <button id="btn3" class="alternativa"></button>
+                </div>
+            </section>
+
+            <section class="ranking-card">
+                <h2>Ranking / Membros</h2>
+                <div id="rankingArea" class="rankings">
+                    <p>Quando o quiz terminar, aqui você pode colocar o ranking manualmente.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='quiz.js') }}"></script>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>
