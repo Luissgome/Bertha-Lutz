@@ -1,4 +1,4 @@
-const questoes = [
+export const questoes = [
     {
         id: 1,
         pergunta: "Se um companheiro tira a vida da companheira que tipo de feminicídio se torna?",
@@ -29,22 +29,22 @@ const questoes = [
         pergunta:"O que é feminicídio infantil?",
         opcoes:[
             "A) Quando a vítima é idosa",
-            "B) Quando a vítima é criança ou adolescente",
-            "C) Quando ocorre dentro de casa",
+            "B) Quando ocorre dentro de casa",
+            "C) Quando a vítima é criança ou adolescente",
             "D) Quando não há relação com o agressor"
         ],
-        resposta: "B) Quando a vítima é criança ou adolescente"
+        resposta: "C) Quando a vítima é criança ou adolescente"
     },
     {
         id:4,
         pergunta:"Quem foi Bertha Lutz?",
         opcoes:[
-            "A) Uma médica famosa",
+            "A) Uma ativista feminista brasileira",
             "B) Uma escritora de romances",
-            "C) Uma ativista feminista brasileira",
+            "C) Uma médica famosa",
             "D) Uma política internacional"
         ],
-        resposta: "C) Uma ativista feminista brasileira"
+        resposta: "A) Uma ativista feminista brasileira"
     },
 
     {
@@ -52,11 +52,11 @@ const questoes = [
         pergunta:"O que a Bertha Lutz defendia?",
         opcoes:[
             "A) Apenas educação masculina",
-            "B) Direitos das mulheres (voto, igualdade)",
+            "B) Exclusão feminina da política",
             "C) Ditadura militar",
-            "D) Exclusão feminina da política"
+            "D) Direitos das mulheres (voto, igualdade)"
         ],
-        resposta: "B) Direitos das mulheres (voto, igualdade)"
+        resposta: "D) Direitos das mulheres (voto, igualdade)"
     },
 
     {
@@ -64,9 +64,9 @@ const questoes = [
         pergunta:"Qual era a carreira da Bertha Lutz?",
         opcoes:[
             "A) Engenheira",
-                "B) Professora de matemática",
-                "C) Bióloga e política",
-                "D) Advogada criminal"
+            "B) Professora de matemática",
+            "C) Bióloga e política",
+            "D) Advogada criminal"
             ],
             resposta: "C) Bióloga e política"
     },
@@ -122,7 +122,7 @@ const questoes = [
         id:11,
         pergunta:"Expor foto de uma mulher de biquíni sem autorização é crime? Por quê?",
         opcoes:[
-            "A) Não, porque está na internet",,
+            "A) Não, porque está na internet",
             "B) Sim, pois viola privacidade e pode configurar crime",
             "C) Só é crime se for famosa",
             "D) Não, se não houver lucro"

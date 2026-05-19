@@ -1,6 +1,9 @@
 let verificacao = false;
 const socket = io();
 const senhaGerada = gerarCodigo();
+import { questoes } from './quiz.js';
+const perguntas = questoes;
+let perguntasEmbaralhadas = [];
 
 function getCodigoSalaDaUrl() {
     const segmentos = window.location.pathname.split('/').filter(Boolean);
@@ -157,4 +160,47 @@ function mostrarCodigoSalaAtual() {
         <p>${roleTexto}</p>
     `;
     div.appendChild(infoSessao);
+}
+
+function embaralharQuestoes(listaOriginal) {
+    let listaCopia = [...listaOriginal];
+    for (let i = listaCopia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [listaCopia[i], listaCopia[j]] = [listaCopia[j], listaCopia[i]];
+    }
+    return listaCopia;
+}
+
+function inicializarQuiz() {
+    perguntasEmbaralhadas = embaralharQuestoes(questoes);
+    proximaPergunta();
+}
+
+function proximaPergunta() {
+    if (perguntasEmbaralhadas.length === 0) {
+        console.log("Fim do Quiz! Todas as perguntas foram respondidas.");
+        alert("Você concluiu o quiz!");
+        return null;
+    }
+
+    const questaoAtual = perguntasEmbaralhadas.pop();
+    console.log("Questão Atual Sorteada:", questaoAtual);
+
+    renderizarQuestaoNaTela(questaoAtual);
+
+    return questaoAtual;
+}
+
+function renderizarQuestaoNaTela(questao) {
+    const containerPergunta = document.getElementById('textoPergunta');
+    if (containerPergunta) {
+        containerPergunta.innerText = questao.pergunta;
+    }
+    
+    questao.opcoes.forEach((opcao, index) => {
+        const botaoOpcao = document.getElementById(`btnOpcao${index}`);
+        if (botaoOpcao) {
+            botaoOpcao.innerText = opcao;
+        }
+    });
 }
