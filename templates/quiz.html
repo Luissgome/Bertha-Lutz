@@ -3,21 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Quiz</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Iniciar Sessão</h1>
-    <button id="btnIniciarQuiz" style="display: none;" onclick="iniciarJogo()">Começar</button>
+    <div class="page-shell">
+        <header class="header-bar">
+            <h1>Sala de Quiz</h1>
+            <div class="input-top-right">
+                <button id="btnIniciarQuiz" style="display: none;" onclick="iniciarJogo()">Começar</button>
+            </div>
+        </header>
 
-    <div id="divCodigo">
-        <a href="/"><button>Voltar</button></a>
-        {% if sala %}
-            <h2>Código da Sala: {{ sala }}</h2>
-        {% endif %}
-        <div id="infoSessao"></div>
+        <main class="content-card grid-two">
+            <section class="card-inner">
+                <div id="divCodigo">
+                    <a href="/"><button>Voltar</button></a>
+                    {% if sala %}
+                        <h2>Código da Sala: {{ sala }}</h2>
+                    {% endif %}
+                    <div id="infoSessao"></div>
+                </div>
+            </section>
+
+            <aside class="card-aside">
+                <h2>Participantes</h2>
+                <div id="membrosLista" class="member-list">
+                    <p>Aqui aparecerá a lista de membros que entrarem.</p>
+                </div>
+            </aside>
+        </main>
     </div>
+
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script type="module" src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>
