@@ -1,9 +1,7 @@
 let verificacao = false;
+let perguntasEmbaralhadas = [];
 const socket = io();
 const senhaGerada = gerarCodigo();
-import { questoes } from './quiz.js';
-const perguntas = questoes;
-let perguntasEmbaralhadas = [];
 
 function getCodigoSalaDaUrl() {
     const segmentos = window.location.pathname.split('/').filter(Boolean);
@@ -51,7 +49,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     mostrarCodigoSalaAtual();
+
+    const textoPergunta = document.getElementById('textoPergunta');
+    if (textoPergunta) {
+        configurarAlternativas();
+        inicializarQuiz();
+    }
 });
+
+function configurarAlternativas() {
+    for (let i = 0; i < 4; i += 1) {
+        const botao = document.getElementById(`btn${i}`);
+        if (!botao) continue;
+        botao.addEventListener('click', () => {
+            proximaPergunta();
+        });
+    }
+}
 
 function iniciarJogo() {
     const sala = getCodigoSalaDaUrl();
@@ -198,9 +212,21 @@ function renderizarQuestaoNaTela(questao) {
     }
     
     questao.opcoes.forEach((opcao, index) => {
-        const botaoOpcao = document.getElementById(`btnOpcao${index}`);
+        const botaoOpcao = document.getElementById(`btn${index}`);
         if (botaoOpcao) {
             botaoOpcao.innerText = opcao;
         }
     });
 }
+
+function mostrarConteudo() {
+    const divConteudo = document.getElementById('conteudo');
+    
+     if (divConteudo === 'none') {
+        divConteudo.style.display = 'block';
+    } else {
+        divConteudo.style.display = 'none';
+    }
+
+
+};
