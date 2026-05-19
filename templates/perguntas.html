@@ -1,32 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz de Perguntas</title>
+    <title>Perguntas</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <h1>Quiz de Perguntas</h1>
+    <div class="page-shell">
+        <header class="header-bar">
+            <h1>Perguntas</h1>
+        </header>
 
-    <div id="statusQuiz">
-        <p>Questão <span id="numeroPergunta">0</span> / <span id="totalPerguntas">0</span></p>
-        <p>Pontuação: <span id="pontuacao">0</span></p>
+        <main class="content-card grid-two">
+            <section class="quiz-card">
+                <h2 id="textoPergunta">Carregando pergunta...</h2>
+                <div id="alternativas" class="alternativas">
+                    <button id="btn0" class="alternativa"></button>
+                    <button id="btn1" class="alternativa"></button>
+                    <button id="btn2" class="alternativa"></button>
+                    <button id="btn3" class="alternativa"></button>
+                </div>
+            </section>
+
+            <section class="ranking-card">
+                <h2>Ranking / Membros</h2>
+                <div id="rankingArea" class="rankings">
+                    <p>Quando o quiz terminar, aqui você pode colocar o ranking manualmente.</p>
+                </div>
+            </section>
+        </main>
     </div>
-
-    <div id="perguntaContainer">
-        <h2 id="textoPergunta">Carregando a pergunta...</h2>
-        <div id="opcoesContainer" class="opcoes-container">
-            <button id="btnOpcao0" class="opcao-btn">Opção 1</button>
-            <button id="btnOpcao1" class="opcao-btn">Opção 2</button>
-            <button id="btnOpcao2" class="opcao-btn">Opção 3</button>
-            <button id="btnOpcao3" class="opcao-btn">Opção 4</button>
-        </div>
-    </div>
-
-    <div id="resultadoFinal" style="display: none; margin-top: 1rem;"></div>
 
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script type="module" src="{{ url_for('static', filename='index.js') }}"></script>
+    <script src="{{ url_for('static', filename='quiz.js') }}"></script>
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>
