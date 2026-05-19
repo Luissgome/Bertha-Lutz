@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 const questoes = [
-=======
-export const questoes = [
->>>>>>> c01810b062df3295c6b0009cdd24601182827837
     {
         id: 1,
         pergunta: "Se um companheiro tira a vida da companheira que tipo de feminicídio se torna?",
@@ -33,39 +29,22 @@ export const questoes = [
         pergunta:"O que é feminicídio infantil?",
         opcoes:[
             "A) Quando a vítima é idosa",
-<<<<<<< HEAD
             "B) Quando a vítima é criança ou adolescente",
             "C) Quando ocorre dentro de casa",
             "D) Quando não há relação com o agressor"
         ],
         resposta: "B) Quando a vítima é criança ou adolescente"
-=======
-            "B) Quando ocorre dentro de casa",
-            "C) Quando a vítima é criança ou adolescente",
-            "D) Quando não há relação com o agressor"
-        ],
-        resposta: "C) Quando a vítima é criança ou adolescente"
->>>>>>> c01810b062df3295c6b0009cdd24601182827837
     },
     {
         id:4,
         pergunta:"Quem foi Bertha Lutz?",
         opcoes:[
-<<<<<<< HEAD
             "A) Uma médica famosa",
             "B) Uma escritora de romances",
             "C) Uma ativista feminista brasileira",
             "D) Uma política internacional"
         ],
         resposta: "C) Uma ativista feminista brasileira"
-=======
-            "A) Uma ativista feminista brasileira",
-            "B) Uma escritora de romances",
-            "C) Uma médica famosa",
-            "D) Uma política internacional"
-        ],
-        resposta: "A) Uma ativista feminista brasileira"
->>>>>>> c01810b062df3295c6b0009cdd24601182827837
     },
 
     {
@@ -73,19 +52,11 @@ export const questoes = [
         pergunta:"O que a Bertha Lutz defendia?",
         opcoes:[
             "A) Apenas educação masculina",
-<<<<<<< HEAD
             "B) Direitos das mulheres (voto, igualdade)",
             "C) Ditadura militar",
             "D) Exclusão feminina da política"
         ],
         resposta: "B) Direitos das mulheres (voto, igualdade)"
-=======
-            "B) Exclusão feminina da política",
-            "C) Ditadura militar",
-            "D) Direitos das mulheres (voto, igualdade)"
-        ],
-        resposta: "D) Direitos das mulheres (voto, igualdade)"
->>>>>>> c01810b062df3295c6b0009cdd24601182827837
     },
 
     {
@@ -93,15 +64,9 @@ export const questoes = [
         pergunta:"Qual era a carreira da Bertha Lutz?",
         opcoes:[
             "A) Engenheira",
-<<<<<<< HEAD
                 "B) Professora de matemática",
                 "C) Bióloga e política",
                 "D) Advogada criminal"
-=======
-            "B) Professora de matemática",
-            "C) Bióloga e política",
-            "D) Advogada criminal"
->>>>>>> c01810b062df3295c6b0009cdd24601182827837
             ],
             resposta: "C) Bióloga e política"
     },
