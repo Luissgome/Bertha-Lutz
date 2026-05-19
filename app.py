@@ -48,32 +48,11 @@ def iniciar():
 def registrar_rota(dados):
     codigo = dados.get('codigo')
     nome = dados.get('nome')
-    role = dados.get('role')
-    cargo = dados.get('cargo')
-    acertos = dados.get('acertos', 0)
+    if not codigo or not nome:
+        return {'status': 'erro', 'mensagem': 'Código e nome são obrigatórios'}
 
-    if not codigo or not nome or not role or not cargo:
-        return {'status': 'erro', 'mensagem': 'Código, nome, role e cargo são obrigatórios'}
-
-    if role != 'criador':
-        conexao = None
-        try:
-            conexao = mysql.connector.connect(**banco)
-            cursor = conexao.cursor(dictionary=True)
-            cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo,))
-            resultado = cursor.fetchone()
-            if not resultado:
-                return {'status': 'erro', 'mensagem': 'Sala não encontrada'}
-        except Error as e:
-            print(f"Erro no MySQL: {e}")
-            return {'status': 'erro', 'mensagem': 'Erro ao verificar sala'}
-        finally:
-            if conexao and conexao.is_connected():
-                cursor.close()
-                conexao.close()
-
-    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js, acertos) VALUES (%s, %s, %s, %s)"
-    sucesso = executar_query(sql, (codigo, nome, cargo, acertos))
+    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js) VALUES (%s, %s, %s)"
+    sucesso = executar_query(sql, (codigo, nome, "SALA_CRIADA"))
     if sucesso:
         return {'status': 'ok'}
     return {'status': 'erro', 'mensagem': 'Erro ao gravar no banco'}
@@ -110,28 +89,11 @@ def acessar_quiz(codigo_da_sala):
 def salvar_progresso(dados):
     id_sessao = dados.get('id')
     nome = dados.get('nome')
-    cargo = dados.get('cargo', 'Aluno')
+    codigo = dados.get('codigo')
     acertos = dados.get('acertos', 0)
 
-    conexao = None
-    try:
-        conexao = mysql.connector.connect(**banco)
-        cursor = conexao.cursor(dictionary=True)
-        cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s AND nome_aluno = %s", (id_sessao, nome))
-        resultado = cursor.fetchone()
-        if resultado:
-            sql = "UPDATE codigos_temporarios SET acertos = %s, conteudo_js = %s WHERE id_sessao = %s AND nome_aluno = %s"
-            cursor.execute(sql, (acertos, cargo, id_sessao, nome))
-        else:
-            sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js, acertos) VALUES (%s, %s, %s, %s)"
-            cursor.execute(sql, (id_sessao, nome, cargo, acertos))
-        conexao.commit()
-    except Error as e:
-        print(f"Erro no MySQL: {e}")
-    finally:
-        if conexao and conexao.is_connected():
-            cursor.close()
-            conexao.close()
+    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js, acertos) VALUES (%s, %s, %s, %s)"
+    executar_query(sql, (id_sessao, nome, codigo, acertos))
 
 
 @socketio.on('começar_quiz_sala')
