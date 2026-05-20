@@ -117,10 +117,22 @@ function entrarSala() {
     botaoAcessar.textContent = 'Acessar';
     botaoAcessar.addEventListener('click', acessar);
 
+    const botaoVoltar = document.createElement('button');
+    botaoVoltar.type = 'button';
+    botaoVoltar.textContent = 'Voltar';
+    botaoVoltar.style.position = 'relative';
+    botaoVoltar.style.right = '1055px';
+    botaoVoltar.style.top = '450px';
+    verificacao = true;
+    
     wrapper.appendChild(inputAcessar);
     wrapper.appendChild(botaoAcessar);
+    wrapper.appendChild(botaoVoltar);
     container.appendChild(wrapper);
-    verificacao = true;
+    botaoVoltar.addEventListener('click', () => {
+        wrapper.remove();
+        verificacao = false;
+    });
 }
 
 function acessar() {
