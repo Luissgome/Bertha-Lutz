@@ -19,13 +19,14 @@ function getNomeDaQueryOuInput() {
 
 function criarSala() {
     const nome_aluno = document.getElementById('inputNome').value.trim();
+    const criador = 'CRIADOR';
 
     if (!nome_aluno) {
         alert('Digite seu nome antes de criar a sala.');
         return;
     }
 
-    socket.emit('registrar_rota', { codigo: senhaGerada, nome: nome_aluno }, (res) => {
+    socket.emit('registrar_rota', { codigo: senhaGerada, nome: nome_aluno, cargo: 'CRIADOR' }, (res) => {
         if (res && res.status === 'ok') {
             const params = new URLSearchParams({
                 nome: nome_aluno,
@@ -50,6 +51,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     mostrarCodigoSalaAtual();
 
+    const sala = getCodigoSalaDaUrl();
+    if (sala) {
+        socket.emit('enviando_informacoes', { codigo: sala });
+    }
+
     const textoPergunta = document.getElementById('textoPergunta');
     if (textoPergunta) {
         configurarAlternativas();
@@ -70,7 +76,8 @@ function configurarAlternativas() {
 function iniciarJogo() {
     const sala = getCodigoSalaDaUrl();
     const nome_aluno = getNomeDaQueryOuInput();
-
+    const cargo = 'CRIADOR';
+    const MEMBRO = 'MEMBRO';
     if (!sala) {
         alert('Código da sala inválido.');
         return;
@@ -80,20 +87,25 @@ function iniciarJogo() {
         return;
     }
 
-    socket.emit('começar_quiz_sala', { sala: sala, nome: nome_aluno });
+    socket.emit('começar_quiz_sala', { sala: sala, nome: nome_aluno, MEMBRO: MEMBRO, cargo: cargo });
 
     const params = new URLSearchParams({
         nome: nome_aluno,
         role: 'criador'
     });
 
-    window.location.href = `/quiz/${sala}/questoes?${params.toString()}`;
+    socket.emit('criador_sala', { role: 'criador' });
+    window.location.href = `/professor-admin/${sala}?${params.toString()}`;
 }
+
 
 socket.on('quiz_iniciar', () => {
     const sala = getCodigoSalaDaUrl();
     const search = window.location.search || '';
-    if (!sala) return;
+    const params = new URLSearchParams(window.location.search);
+    const role = params.get('role');
+
+    if (!sala || role === 'criador') return;
     window.location.href = `/quiz/${sala}/questoes${search}`;
 });
 
@@ -139,6 +151,7 @@ function acessar() {
     const input = document.getElementById('codigoSalaInput');
     const codigo = input ? input.value.trim() : '';
     const nome_aluno = document.getElementById('inputNome').value.trim();
+    const cargo = 'membro';
 
     if (!codigo) {
         alert('Digite o código da sala para acessar.');
@@ -153,8 +166,15 @@ function acessar() {
         nome: nome_aluno,
         role: 'membro'
     });
-    window.location.href = `/quiz/${codigo}?${params.toString()}`;
+    socket.emit('registrando_membros', { codigo: codigo, nome: nome_aluno, cargo : 'MEMBRO', conteudo_js : "ACESSOU_SALA" }, (res) => {
+        if (res && res.status === 'ok') {
+            window.location.href = `/quiz/${codigo}?${params.toString()}`;
+            return;
+        }
+        alert('Erro ao acessar a sala: ' + (res && res.mensagem ? res.mensagem : 'Erro no banco de dados'));
+    });
 }
+    
 
 function gerarCodigo() {
     const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -206,11 +226,19 @@ function proximaPergunta() {
     if (perguntasEmbaralhadas.length === 0) {
         console.log("Fim do Quiz! Todas as perguntas foram respondidas.");
         alert("Você concluiu o quiz!");
+
+        const params = new URLSearchParams(window.location.search);
+        const role = params.get('role');
+        if (role === 'membro') {
+            const search = window.location.search || '';
+            window.location.href = `/gabarito${search}`;
+            return null;
+        }
+
         return null;
     }
 
     const questaoAtual = perguntasEmbaralhadas.pop();
-    console.log("Questão Atual Sorteada:", questaoAtual);
 
     renderizarQuestaoNaTela(questaoAtual);
 
@@ -242,3 +270,31 @@ function mostrarConteudo() {
 
 
 };
+
+socket.on('atualizar_informacoes', (informacoes) => {
+    const membrosList = document.getElementById('membrosLista');
+    if (!membrosList) return;
+    membrosList.innerHTML = '';
+
+    informacoes.forEach((info) => {
+        const li = document.createElement('li');
+        li.textContent = `${info.nome_aluno}`;
+        li.style.margin = '0px';
+        li.style.fontSize = '18px';
+        membrosList.appendChild(li);
+    });
+});
+
+function telaCriador() {
+    const nome_aluno = document.getElementById('inputNome').value.trim();
+    let main = document.getElementById('mainContent');
+    let secaoPerguntas = document.getElementById('secaoPerguntas');
+    let textoPergunta = document.getElementById('textoPergunta');
+    let alternativas = document.getElementById('alternativas');
+    const params = new URLSearchParams({
+                nome: nome_aluno,
+            });
+    if (window.location.href === `/quiz/${senhaGerada}?${params.toString()}&role=criador`) {
+        main.parentNode.removeChild(main);
+    }
+}

@@ -16,6 +16,7 @@ banco = {
 
 def executar_query(sql, valores=None):
     conexao = None
+    cursor = None
     try:
         conexao = mysql.connector.connect(**banco)
         cursor = conexao.cursor()
@@ -27,19 +28,43 @@ def executar_query(sql, valores=None):
         return True
     except Error as e:
         print(f"Erro no MySQL: {e}")
-        return False
+        return str(e)
     finally:
-        if conexao and conexao.is_connected():
+        if cursor is not None:
             cursor.close()
+        if conexao is not None and conexao.is_connected():
             conexao.close()
+
+
+def emitir_informacoes_sala(codigo):
+    conexao = mysql.connector.connect(**banco)
+    cursor = conexao.cursor(dictionary=True)
+    query = "SELECT nome_aluno, cargo, acertos FROM codigos_temporarios WHERE id_sessao = %s"
+    cursor.execute(query, (codigo,))
+    informacoes = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+    emit('atualizar_informacoes', informacoes, broadcast=True)
+    return informacoes
 
 
 @app.route('/')
 def index():
     return render_template('index.html')
-@app.route('/admin')
-def admin():
-    return render_template('admin.html')
+
+@app.route('/professor-admin/<codigo_da_sala>')
+def admin(codigo_da_sala):
+    conexao = mysql.connector.connect(**banco)
+    cursor = conexao.cursor(dictionary=True)
+    cursor.execute(
+        "SELECT id_sessao, nome_aluno, cargo FROM codigos_temporarios WHERE id_sessao = %s AND cargo = 'CRIADOR'",
+        (codigo_da_sala,)
+    )
+    informacoes = cursor.fetchall()
+    cursor.close()
+    conexao.close()
+    return render_template('admin.html', informacoes=informacoes, sala=codigo_da_sala)
+
 @app.route('/quiz')
 def iniciar():
     return render_template('quiz.html')
@@ -48,19 +73,20 @@ def iniciar():
 def registrar_rota(dados):
     codigo = dados.get('codigo')
     nome = dados.get('nome')
+    cargo = dados.get('cargo', 'criador')
     if not codigo or not nome:
         return {'status': 'erro', 'mensagem': 'Código e nome são obrigatórios'}
 
-    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, conteudo_js) VALUES (%s, %s, %s)"
-    sucesso = executar_query(sql, (codigo, nome, "SALA_CRIADA"))
-    if sucesso:
+    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, cargo, conteudo_js) VALUES (%s, %s, %s, %s)"
+    sucesso = executar_query(sql, (codigo, nome, cargo, "SALA_CRIADA"))
+    if sucesso is True:
         return {'status': 'ok'}
-    return {'status': 'erro', 'mensagem': 'Erro ao gravar no banco'}
+    return {'status': 'erro', 'mensagem': f'Erro ao gravar no banco: {sucesso}'}
 
 @app.route('/quiz/<codigo_da_sala>/questoes')
 def acessar_questoes(codigo_da_sala):
     conexao = mysql.connector.connect(**banco)
-    cursor = conexao.cursor(dictionary=True)
+    cursor = conexao.cursor(dictionary=True, buffered=True)
     cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo_da_sala,))
     resultado = cursor.fetchone()
     cursor.close()
@@ -74,7 +100,7 @@ def acessar_questoes(codigo_da_sala):
 @app.route('/quiz/<codigo_da_sala>')
 def acessar_quiz(codigo_da_sala):
     conexao = mysql.connector.connect(**banco)
-    cursor = conexao.cursor(dictionary=True)
+    cursor = conexao.cursor(dictionary=True, buffered=True)
     cursor.execute("SELECT id_sessao FROM codigos_temporarios WHERE id_sessao = %s", (codigo_da_sala,))
     resultado = cursor.fetchone()
     cursor.close()
@@ -84,6 +110,10 @@ def acessar_quiz(codigo_da_sala):
         return render_template('quiz.html', sala=codigo_da_sala)
     else:
         return "<h1>Sala não encontrada!</h1>", 404
+
+@app.route('/gabarito')
+def gabarito():
+    return render_template('gabarito.html')
 
 @socketio.on('enviar_progresso')
 def salvar_progresso(dados):
@@ -98,7 +128,6 @@ def salvar_progresso(dados):
 
 @socketio.on('começar_quiz_sala')
 def comecar_quiz_sala(dados):
-    """Recebe do criador para iniciar o quiz e notifica os membros."""
     sala = dados.get('sala')
     nome = dados.get('nome')
 
@@ -117,10 +146,36 @@ def enviar_ranking():
     
     emit('atualizar_ranking', ranking, broadcast=True)
 
+@socketio.on('registrando_membros')
+def registrar_membros(dados):
+    codigo = dados.get('codigo')
+    nome = dados.get('nome')
+    cargo = dados.get('cargo')
+    conteudo_js = dados.get('conteudo_js', 'MEMBRO_ENTROU')
+
+    sql = "INSERT INTO codigos_temporarios (id_sessao, nome_aluno, cargo, conteudo_js) VALUES (%s, %s, %s, %s)"
+    sucesso = executar_query(sql, (codigo, nome, cargo, conteudo_js))
+    if sucesso is True:
+        emitir_informacoes_sala(codigo)
+        return {'status': 'ok'}
+    return {'status': 'erro', 'mensagem': f'Erro ao gravar membro no banco: {sucesso}'}
+
+@socketio.on('enviando_informacoes')
+def enviando_informacoes(dados):
+    conexao = mysql.connector.connect(**banco)
+    cursor = conexao.cursor(dictionary=True)
+    
+    query = "SELECT nome_aluno, cargo, acertos FROM codigos_temporarios WHERE id_sessao = %s"
+    cursor.execute(query, (dados.get('codigo'),))
+    informacoes = cursor.fetchall()
+
+    cursor.close()
+    conexao.close()
+    emit('atualizar_informacoes', informacoes, broadcast=True)
 
 @socketio.on('limpar_banco')
 def deletar_dados():
-    sql = "DELETE FROM codigos_temporarios WHERE id"
+    sql = "DELETE FROM codigos_temporarios"
     executar_query(sql)
 
 if __name__ == '__main__':

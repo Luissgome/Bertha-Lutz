@@ -163,7 +163,7 @@ input {
 
 .member-list,
 .rankings {
-    min-height: 180px;
+    min-height: 400px;
     padding: 18px;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.05);
@@ -242,6 +242,67 @@ input {
         bottom: 16px;
         right: 16px;
     }
+}
+
+.gabarito-list {
+    display: grid;
+    gap: 20px;
+}
+
+.gabarito-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 26px;
+    padding: 28px;
+}
+
+.gabarito-card h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 1.35rem;
+    line-height: 1.4;
+}
+
+.gabarito-opcoes {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.gabarito-opcoes span {
+    display: block;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #f3ecff;
+}
+
+.gabarito-resposta {
+    margin-bottom: 16px;
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(107, 68, 255, 0.12);
+    border: 1px solid rgba(155, 124, 255, 0.22);
+    color: #fff;
+}
+
+.gabarito-explicacao {
+    width: 100%;
+    min-height: 120px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.05);
+    color: #efe7ff;
+    padding: 18px;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+}
+
+.gabarito-explicacao:focus {
+    border-color: #b69dff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 #acessoSalaWrapper {
