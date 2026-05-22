@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 import mysql.connector
 import os
 from mysql.connector import Error
