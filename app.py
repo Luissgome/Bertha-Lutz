@@ -8,10 +8,10 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'pinbas'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-db_host = os.environ.get("MYSQLHOST")
-db_user = os.environ.get("MYSQLUSER")
-db_password = os.environ.get("MYSQLPASSWORD")
-db_database = os.environ.get("MYSQLDATABASE")
+db_host = os.environ.get("MYSQLHOST", "localhost")
+db_user = os.environ.get("MYSQLUSER", "root")
+db_password = os.environ.get("MYSQLPASSWORD", "")
+db_database = os.environ.get("MYSQLDATABASE", "nome_do_seu_banco_local")
 db_port = int(os.environ.get("MYSQLPORT", 3306))
 
 conexao = mysql.connector.connect(
