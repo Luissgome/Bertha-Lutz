@@ -26,25 +26,17 @@
             </div>
         </main>
 
-        <button class="help-button" onclick="mostrarConteudo()"><strong>?</strong></button>
+        <button class="help-button" onclick="abrirSlides()"><strong>?</strong></button>
 
-        <div id="conteudo" class="info-panel" style="display: none;">
-            <h2>Leis importantes no Brasil</h2>
-            <p>
-                O Brasil possui várias leis para proteger as mulheres:
-            </p>
-            <p>
-                Lei Maria da Penha: protege mulheres contra violência doméstica e familiar.
-            </p>
-            <p>
-                Lei do Minuto Seguinte: garante atendimento imediato e gratuito às vítimas de violência sexual.
-            </p>
-            <p>
-                Lei Carolina Dieckmann: combate crimes virtuais como invasão de dispositivos.
-            </p>
-            <p>
-                Lei Rose Leonel: pune quem divulga conteúdo íntimo sem autorização.
-            </p>
+        <div id="container-slides" class="oculto">
+            <div class="caixa-slide">
+                <img id="imagem-atual" src="" alt="Tutorial">
+                <div class="controles">
+                    <button id="btn-voltar" onclick="mudarSlide(-1)">Voltar</button>
+                    <button id="btn-proximo" onclick="mudarSlide(1)">Próximo</button>
+                    <button id="btn-fechar" class="oculto" onclick="fecharSlides()">Fechar</button>
+                </div>
+            </div>
         </div>
     </div>
 

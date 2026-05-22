@@ -3,9 +3,12 @@ let perguntasEmbaralhadas = [];
 const socket = io();
 const senhaGerada = gerarCodigo();
 
+let acertosContador = 0;
+let questaoAtual = null;
+
 function getCodigoSalaDaUrl() {
     const segmentos = window.location.pathname.split('/').filter(Boolean);
-    if (segmentos.length >= 2 && segmentos[0] === 'quiz') return segmentos[1];
+    if (segmentos.length >= 2 && (segmentos[0] === 'quiz' || segmentos[0] === 'professor-admin')) return segmentos[1];
     return null;
 }
 
@@ -54,6 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sala = getCodigoSalaDaUrl();
     if (sala) {
         socket.emit('enviando_informacoes', { codigo: sala });
+        if (window.location.pathname.startsWith('/professor-admin')) {
+            socket.emit('buscar_ranking', { sala });
+            setInterval(() => socket.emit('buscar_ranking', { sala }), 5000);
+        }
     }
 
     const textoPergunta = document.getElementById('textoPergunta');
@@ -68,9 +75,22 @@ function configurarAlternativas() {
         const botao = document.getElementById(`btn${i}`);
         if (!botao) continue;
         botao.addEventListener('click', () => {
-            proximaPergunta();
+            selecionarResposta(i);
         });
     }
+}
+
+function selecionarResposta(index) {
+    if (!questaoAtual) {
+        return;
+    }
+
+    const opcaoEscolhida = questaoAtual.opcoes[index];
+    if (opcaoEscolhida === questaoAtual.resposta) {
+        acertosContador += 1;
+    }
+
+    proximaPergunta();
 }
 
 function iniciarJogo() {
@@ -97,7 +117,6 @@ function iniciarJogo() {
     socket.emit('criador_sala', { role: 'criador' });
     window.location.href = `/professor-admin/${sala}?${params.toString()}`;
 }
-
 
 socket.on('quiz_iniciar', () => {
     const sala = getCodigoSalaDaUrl();
@@ -175,7 +194,6 @@ function acessar() {
     });
 }
     
-
 function gerarCodigo() {
     const caracteres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let senha = '';
@@ -199,13 +217,17 @@ function mostrarCodigoSalaAtual() {
         return;
     }
 
-    const infoSessao = document.createElement('div');
-    infoSessao.id = 'infoSessao';
+    let infoSessao = document.getElementById('infoSessao');
+    if (!infoSessao) {
+        infoSessao = document.createElement('div');
+        infoSessao.id = 'infoSessao';
+        div.appendChild(infoSessao);
+    }
+
     infoSessao.innerHTML = `
         <p><strong>Nome:</strong> ${nome}</p>
         <p>${roleTexto}</p>
     `;
-    div.appendChild(infoSessao);
 }
 
 function embaralharQuestoes(listaOriginal) {
@@ -219,29 +241,40 @@ function embaralharQuestoes(listaOriginal) {
 
 function inicializarQuiz() {
     perguntasEmbaralhadas = embaralharQuestoes(questoes);
+    acertosContador = 0;
+    questaoAtual = null;
     proximaPergunta();
 }
 
 function proximaPergunta() {
     if (perguntasEmbaralhadas.length === 0) {
         console.log("Fim do Quiz! Todas as perguntas foram respondidas.");
-        alert("Você concluiu o quiz!");
 
         const params = new URLSearchParams(window.location.search);
         const role = params.get('role');
+        const nome_aluno = getNomeDaQueryOuInput();
+        const sala = getCodigoSalaDaUrl();
+
         if (role === 'membro') {
-            const search = window.location.search || '';
-            window.location.href = `/gabarito${search}`;
+            if (sala && nome_aluno) {
+                socket.emit('enviar_progresso', {
+                    id: sala,
+                    nome: nome_aluno,
+                    codigo: sala,
+                    acertos: acertosContador
+                });
+            }
+            const redirectParams = new URLSearchParams({ nome: nome_aluno, acertos: acertosContador });
+            window.location.href = `/agradecimento?${redirectParams.toString()}`;
             return null;
         }
 
+        alert("Quiz concluído!");
         return null;
     }
 
-    const questaoAtual = perguntasEmbaralhadas.pop();
-
+    questaoAtual = perguntasEmbaralhadas.pop();
     renderizarQuestaoNaTela(questaoAtual);
-
     return questaoAtual;
 }
 
@@ -259,18 +292,6 @@ function renderizarQuestaoNaTela(questao) {
     });
 }
 
-function mostrarConteudo() {
-    const divConteudo = document.getElementById('conteudo');
-    
-     if (divConteudo === 'none') {
-        divConteudo.style.display = 'block';
-    } else {
-        divConteudo.style.display = 'none';
-    }
-
-
-};
-
 socket.on('atualizar_informacoes', (informacoes) => {
     const membrosList = document.getElementById('membrosLista');
     if (!membrosList) return;
@@ -285,16 +306,88 @@ socket.on('atualizar_informacoes', (informacoes) => {
     });
 });
 
+socket.on('atualizar_ranking', (ranking) => {
+    const rankingLista = document.getElementById('rankingLista');
+    if (!rankingLista) return;
+
+    rankingLista.innerHTML = '';
+    if (!ranking || ranking.length === 0) {
+        rankingLista.innerHTML = '<p>Nenhum participante com acertos registrados ainda.</p>';
+        return;
+    }
+
+    ranking.forEach((item, index) => {
+        const linha = document.createElement('div');
+        linha.className = 'ranking-item';
+        linha.innerHTML = `<span>${index + 1}. ${item.nome_aluno}</span><strong>${item.acertos || 0} acertos</strong>`;
+        rankingLista.appendChild(linha);
+    });
+});
+
 function telaCriador() {
     const nome_aluno = document.getElementById('inputNome').value.trim();
     let main = document.getElementById('mainContent');
-    let secaoPerguntas = document.getElementById('secaoPerguntas');
-    let textoPergunta = document.getElementById('textoPergunta');
-    let alternativas = document.getElementById('alternativas');
-    const params = new URLSearchParams({
-                nome: nome_aluno,
-            });
+    const params = new URLSearchParams({ nome: nome_aluno });
     if (window.location.href === `/quiz/${senhaGerada}?${params.toString()}&role=criador`) {
-        main.parentNode.removeChild(main);
+        if (main && main.parentNode) {
+            main.parentNode.removeChild(main);
+        }
     }
+}
+
+const imagens = [
+    "static/imgs/bertha lutz1.jpg",
+    "static/imgs/bertha lutz2.jpg",
+    "static/imgs/bertha lutz3.jpg",
+    "static/imgs/bertha lutz4.jpg",
+    "static/imgs/bertha lutz5.jpg",
+    "static/imgs/bertha lutz6.jpg",
+    "static/imgs/bertha lutz7.jpg",
+    "static/imgs/bertha lutz8.jpg",
+    "static/imgs/bertha lutz9.jpg",
+    "static/imgs/bertha lutz10.jpg",
+    "static/imgs/bertha lutz11.jpg",
+    
+];
+
+let indiceAtual = 0;
+
+function atualizarTelaSlides() {
+    const imagemEl = document.getElementById("imagem-atual");
+    const btnVoltar = document.getElementById("btn-voltar");
+    const btnProximo = document.getElementById("btn-proximo");
+    const btnFechar = document.getElementById("btn-fechar");
+
+    if (!imagemEl) return;
+
+    imagemEl.src = imagens[indiceAtual];
+
+    if (indiceAtual === 0) {
+        btnVoltar.classList.add("oculto");
+    } else {
+        btnVoltar.classList.remove("oculto");
+    }
+
+    if (indiceAtual === imagens.length - 1) {
+        btnProximo.classList.add("oculto");
+        btnFechar.classList.remove("oculto");
+    } else {
+        btnProximo.classList.remove("oculto");
+        btnFechar.classList.add("oculto");
+    }
+}
+
+function abrirSlides() {
+    indiceAtual = 0; 
+    document.getElementById("container-slides").classList.remove("oculto");
+    atualizarTelaSlides();
+}
+
+function fecharSlides() {
+    document.getElementById("container-slides").classList.add("oculto");
+}
+
+function mudarSlide(direcao) {
+    indiceAtual += direcao;
+    atualizarTelaSlides();
 }

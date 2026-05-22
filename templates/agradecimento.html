@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obrigado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="header-bar">
+            <h1>Obrigado por participar</h1>
+        </header>
+
+        <main class="content-card">
+            <section class="card-inner result-card">
+                {% if nome %}
+                    <p><strong>Olá, {{ nome }}!</strong></p>
+                {% endif %}
+                <h2>Obrigado por responder o quiz.</h2>
+                <p>Você acertou <strong>{{ acertos }}</strong> pergunta{{ 's' if acertos|int != 1 else '' }}.</p>
+                <div class="button-group">
+                    <a href="/gabarito"><button>Gabarito</button></a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

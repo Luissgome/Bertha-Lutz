@@ -1,6 +1,6 @@
 import mysql.connector
 from mysql.connector import Error
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
@@ -115,6 +115,12 @@ def acessar_quiz(codigo_da_sala):
 def gabarito():
     return render_template('gabarito.html')
 
+@app.route('/agradecimento')
+def agradecimento():
+    nome = request.args.get('nome', '')
+    acertos = request.args.get('acertos', '0')
+    return render_template('agradecimento.html', nome=nome, acertos=acertos)
+
 @socketio.on('enviar_progresso')
 def salvar_progresso(dados):
     id_sessao = dados.get('id')
@@ -134,17 +140,23 @@ def comecar_quiz_sala(dados):
     emit('quiz_iniciar', {'sala': sala, 'nome': nome}, broadcast=True)
 
 @socketio.on('buscar_ranking')
-def enviar_ranking():
+def enviar_ranking(dados=None):
+    dados = dados or {}
+    sala = dados.get('sala')
     conexao = mysql.connector.connect(**banco)
     cursor = conexao.cursor(dictionary=True)
-    sql = "SELECT nome_aluno, acertos FROM codigos_temporarios ORDER BY acertos DESC LIMIT 5"
-    cursor.execute(sql)
+    if sala:
+        sql = "SELECT nome_aluno, acertos FROM codigos_temporarios WHERE id_sessao = %s AND acertos IS NOT NULL ORDER BY acertos DESC LIMIT 10"
+        cursor.execute(sql, (sala,))
+    else:
+        sql = "SELECT nome_aluno, acertos FROM codigos_temporarios WHERE acertos IS NOT NULL ORDER BY acertos DESC LIMIT 10"
+        cursor.execute(sql)
     ranking = cursor.fetchall()
     
     cursor.close()
     conexao.close()
     
-    emit('atualizar_ranking', ranking, broadcast=True)
+    emit('atualizar_ranking', ranking)
 
 @socketio.on('registrando_membros')
 def registrar_membros(dados):

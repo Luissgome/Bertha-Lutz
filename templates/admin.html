@@ -2,21 +2,36 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Admin</title>
-    <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
     <div class="page-shell">
         <header class="header-bar">
-            <h1>Ranking</h1>
+            <div>
+                <h1>Ranking da Sala</h1>
+                {% if sala %}
+                    <p style="margin: 8px 0 0; color: rgba(255,255,255,0.75);">Código: {{ sala }}</p>
+                {% endif %}
+            </div>
         </header>
-        <section class="ranking-card" id="secaoRanking">
+
+        <main class="content-card grid-two">
+            <section class="ranking-card" id="secaoRanking">
                 <h2>Ranking</h2>
+                <div id="rankingLista" class="member-list">
+                    <p>O ranking será atualizado a cada 5 segundos.</p>
+                </div>
+            </section>
+
+            <aside class="card-aside">
                 <div id="membrosLista" class="member-list">
+                    <h2>Participantes</h2>
                     <p>Aqui aparecerá a lista de membros que entrarem.</p>
                 </div>
-        </section>
+            </aside>
+        </main>
     </div>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="{{ url_for('static', filename='index.js') }}"></script>
