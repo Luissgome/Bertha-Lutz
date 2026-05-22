@@ -10,17 +10,17 @@ socketio = SocketIO(app, cors_allowed_origins="*")
 
 db_host = os.environ.get("MYSQLHOST", "localhost")
 db_user = os.environ.get("MYSQLUSER", "root")
-db_password = os.environ.get("MYSQLPASSWORD", "")
-db_database = os.environ.get("MYSQLDATABASE", "nome_do_seu_banco_local")
+db_password = os.environ.get("MYSQLPASSWORD", "Luis050810.")
+db_database = os.environ.get("MYSQLDATABASE", "Local instance MySQL80")
 db_port = int(os.environ.get("MYSQLPORT", 3306))
 
-conexao = mysql.connector.connect(
-    host=db_host,
-    user=db_user,
-    password=db_password,
-    database=db_database,
-    port=db_port
-)
+banco = {
+    "host": db_host,
+    "user": db_user,
+    "password": db_password,
+    "database": db_database,
+    "port": db_port
+}
 
 def executar_query(sql, valores=None):
     conexao = None
