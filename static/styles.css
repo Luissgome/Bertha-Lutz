@@ -394,25 +394,30 @@ input {
     padding: 20px;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .caixa-slide {
     background-color: rgb(46, 4, 73);
-    padding: 28px;
-    border-radius: 18px;
+    padding: 30px;
+    border-radius: 12px;
     text-align: center;
-    width: min(760px, 100%);
-    max-width: 760px;
-    height: auto;
-    max-height: calc(100vh - 80px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    max-width: 90%;
 }
 
 #imagem-atual {
     width: 100%;
-    max-width: 100%;
-    height: auto;
+    max-width: 900px;
+    max-height: 600px;
     max-height: calc(100vh - 180px);
     display: block;
     margin-bottom: 20px;
     border-radius: 16px;
+    margin: 0 auto 25px auto;
     object-fit: contain;
 }
 
