@@ -1,4 +1,5 @@
 import mysql.connector
+import os
 from mysql.connector import Error
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
@@ -191,4 +192,5 @@ def deletar_dados():
     executar_query(sql)
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0', port=5500)
+    port = int(os.environ.get("PORT", 5000))
+    socketio.run(app, debug=True, host='0.0.0.0', port=port)
