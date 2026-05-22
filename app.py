@@ -1,5 +1,6 @@
 import eventlet
 eventlet.monkey_patch()
+
 import mysql.connector
 import os
 from mysql.connector import Error
@@ -195,10 +196,11 @@ def enviando_informacoes(dados):
     conexao.close()
     emit('atualizar_informacoes', informacoes, broadcast=True)
 
-@socketio.on('limpar_banco')
-def deletar_dados():
+@app.route('/admin/limpar-banco-pinbas')
+def limpar_banco():
     sql = "DELETE FROM codigos_temporarios"
     executar_query(sql)
+    return "<h1>Banco limpo com sucesso!</h1>"
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
